@@ -1,0 +1,80 @@
+export type Game = {
+  id: number;
+  title: string;
+  image: string;
+  price: number;
+  oldPrice: number | null;
+  discount: number | null;
+  tags: string[];
+};
+
+export const FEATURED_GAMES: Game[] = [
+  {
+    id: 1,
+    title: "Baldur's Gate 3",
+    image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1086940/header.jpg",
+    price: 47.99,
+    oldPrice: 59.99,
+    discount: 20,
+    tags: ["HIT", "RPG"],
+  },
+  {
+    id: 2,
+    title: "Red Dead Redemption 2",
+    image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1174180/header.jpg",
+    price: 29.99,
+    oldPrice: null,
+    discount: null,
+    tags: ["ATMOSPHERIC", "OPEN WORLD"],
+  },
+  {
+    id: 3,
+    title: "Hades II",
+    image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1145350/header.jpg",
+    price: 24.99,
+    oldPrice: null,
+    discount: null,
+    tags: ["NEW", "ROGUE-LIKE"],
+  },
+  {
+    id: 4,
+    title: "Horizon Forbidden West",
+    image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2420110/header.jpg",
+    price: 41.99,
+    oldPrice: 59.99,
+    discount: 30,
+    tags: ["SALE", "ACTION"],
+  },
+];
+
+export const SPECIAL_OFFERS: Game[] = [
+  {
+    id: 5,
+    title: "The Witcher 3",
+    image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/292030/header.jpg",
+    price: 9.99,
+    oldPrice: 39.99,
+    discount: 75,
+    tags: ["RPG", "OPEN WORLD"],
+  },
+  {
+    id: 6,
+    title: "Lies of P",
+    image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1627720/header.jpg",
+    price: 29.99,
+    oldPrice: 59.99,
+    discount: 50,
+    tags: ["HARDCORE", "ACTION"],
+  },
+  {
+    id: 7,
+    title: "Sekiro",
+    image: "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/814380/header.jpg",
+    price: 23.99,
+    oldPrice: 59.99,
+    discount: 60,
+    tags: ["HARDCORE", "ACTION"],
+  },
+];
+
+export const GAMES = [...FEATURED_GAMES, ...SPECIAL_OFFERS];
