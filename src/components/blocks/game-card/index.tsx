@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import type { Game } from "@/data/mock-games";
+import type { Game } from "@/types/game";
 
 const TAG_STYLES: Record<string, string> = {
   HIT: "bg-rose-400/15 text-rose-300",
