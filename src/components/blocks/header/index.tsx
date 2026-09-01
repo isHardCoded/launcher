@@ -3,7 +3,12 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/in
 
 const NAV = ["STORE", "LIBRARY", "COMMUNITY", "PROFILE"] as const;
 
-export function Header() {
+type HeaderProps = {
+  search: string;
+  onSearchChange: (search: string) => void;
+};
+
+export function Header({ search, onSearchChange }: HeaderProps) {
   return (
     <header className="flex h-16 shrink-0 items-center gap-8 border-b border-border bg-background px-5">
       <a href="#" className="text-[15px] font-semibold tracking-[0.18em] text-foreground">
@@ -31,8 +36,10 @@ export function Header() {
           <Search className="size-4 text-muted-foreground" />
         </InputGroupAddon>
         <InputGroupInput
-          placeholder="Search games, friends, ..."
+          placeholder="Поиск по названию..."
           className="text-[13px] placeholder:text-muted-foreground"
+          value={search}
+          onChange={(event) => onSearchChange(event.target.value)}
         />
       </InputGroup>
     </header>
