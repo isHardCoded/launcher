@@ -143,3 +143,12 @@ C:\Users\kiril\Desktop\launcher\api\obj\Debug\net10.0\refint\api.dll
 C:\Users\kiril\Desktop\launcher\api\obj\Debug\net10.0\api.pdb
 C:\Users\kiril\Desktop\launcher\api\obj\Debug\net10.0\api.genruntimeconfig.cache
 C:\Users\kiril\Desktop\launcher\api\obj\Debug\net10.0\ref\api.dll
+C:\Users\kiril\Desktop\launcher\api\bin\Debug\net10.0\Microsoft.Bcl.Cryptography.dll
+C:\Users\kiril\Desktop\launcher\api\bin\Debug\net10.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Users\kiril\Desktop\launcher\api\bin\Debug\net10.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\kiril\Desktop\launcher\api\bin\Debug\net10.0\Microsoft.IdentityModel.Logging.dll
+C:\Users\kiril\Desktop\launcher\api\bin\Debug\net10.0\Microsoft.IdentityModel.Tokens.dll
+C:\Users\kiril\Desktop\launcher\api\bin\Debug\net10.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\kiril\Desktop\launcher\api\bin\Debug\net10.0\Microsoft.IdentityModel.Protocols.dll
+C:\Users\kiril\Desktop\launcher\api\bin\Debug\net10.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\Users\kiril\Desktop\launcher\api\bin\Debug\net10.0\System.IdentityModel.Tokens.Jwt.dll
