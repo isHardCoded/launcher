@@ -32,5 +32,14 @@ public class AppDbContext : DbContext
       .WithMany(token => token.RefreshTokens)
       .HasForeignKey(user => user.UserId)
       .OnDelete(DeleteBehavior.Cascade);
+
+    modelBuilder.Entity<User>(user =>
+    {
+      user.Property(u => u.Username).HasMaxLength(32).UseCollation("NOCASE");
+      user.Property(u => u.FirstName).HasMaxLength(50);
+      user.Property(u => u.LastName).HasMaxLength(50);
+      user.Property(u => u.Bio).HasMaxLength(500);
+      user.Property(u => u.AvatarFileName).HasMaxLength(64);
+    });
   }
 }

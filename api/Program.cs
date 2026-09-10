@@ -1,10 +1,12 @@
 using System.Text;
 using api.Data;
 using api.Models;
+using api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +20,7 @@ var jwtOptions = builder.Configuration
     .GetSection(JwtOptions.SectionName)
     .Get<JwtOptions>() ?? throw new InvalidOperationException("JWT conf not found");
 
+builder.Services.AddSingleton<AvatarStorage>();
 builder.Services.AddScoped<JwtTokenService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services
@@ -71,6 +74,15 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles(new StaticFileOptions
+{
+   FileProvider = new PhysicalFileProvider(
+        app.Services.GetRequiredService<AvatarStorage>().RootPath
+    ), 
+    RequestPath = "/uploads/avatars"
+});
+
 app.UseRouting();
 
 app.UseCors("ReactApp");

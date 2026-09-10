@@ -7,6 +7,8 @@ using System.Text;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.WebUtilities;
 
+namespace api.Services;
+
 public class JwtTokenService
 {
   private readonly JwtOptions _options;

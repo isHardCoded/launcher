@@ -1,10 +1,8 @@
-namespace api.Models;
+namespace api.DTOs;
 
-public class User
+public class ProfileDto
 {
   public int Id { get; set; }
-  public string Email { get; set; }
-  public string PasswordHash { get; set; } = null;
   public string? Username { get; set; }
   public string? FirstName { get; set; }
   public string? LastName { get; set; }
@@ -12,6 +10,4 @@ public class User
   public DateOnly? BirthDate { get; set; }
   public string? AvatarFileName { get; set; }
   public DateTime CreatedAtUtc { get; set; }
-  public DateTime? UpdatedAtUtc { get; set; }
-  public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 }

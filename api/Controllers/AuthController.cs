@@ -1,6 +1,7 @@
 using api.Data;
 using api.DTOs;
 using api.Models;
+using api.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -30,7 +31,7 @@ public class AuthController : ControllerBase
     var email = request.Email.Trim().ToLowerInvariant();
 
     var exists = await _db.Users.AnyAsync(user => user.Email == email);
-
+    
     if (exists)
     {
       return Conflict(new
@@ -41,7 +42,8 @@ public class AuthController : ControllerBase
 
     var user = new User
     {
-      Email = email
+      Email = email,
+      CreatedAtUtc = DateTime.UtcNow
     };
 
     user.PasswordHash = _passwordHasher.HashPassword(
