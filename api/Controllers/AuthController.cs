@@ -97,6 +97,32 @@ public class AuthController : ControllerBase
     return Ok(response);
   }
 
+  [HttpPost("refresh")]
+  public async Task<ActionResult<AuthResponse>> Refresh(RefreshRequest request)
+  {
+    var hash = _jwt.HashRefreshToken(request.RefreshToken);
+
+    var storedToken = await _db.RefreshTokens
+      .Include(token => token.User)
+      .SingleOrDefaultAsync(token => token.TokenHash == hash);
+
+    if (storedToken == null || storedToken.RevokedAtUtc != null || storedToken.ExpiresAtUtc <= DateTime.UtcNow)
+    {
+      return Unauthorized(new
+      {
+        message = "Сессия истекла. Войдите снова"
+      });
+    }
+
+    var response = await CreateTokenPair(storedToken.User);
+
+    storedToken.RevokedAtUtc = DateTime.UtcNow;
+    storedToken.ReplacedByTokenHash = _jwt.HashRefreshToken(response.RefreshToken);
+    await _db.SaveChangesAsync();
+
+    return Ok(response);
+  }
+
   private async Task<AuthResponse> CreateTokenPair(User user)
   {
     var accessToken = _jwt.CreateAccessToken(user);

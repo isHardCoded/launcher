@@ -4,19 +4,24 @@ namespace api.DTOs;
 
 public class UpdateProfileRequest
 {
-  [Required(ErrorMessage = "Username is required")]
-  [StringLength(32, MinimumLength = 3, ErrorMessage = "Username must be between 3 and 32 characters")]
-  [RegularExpression("^[a-zA-Z0-9_]+$", ErrorMessage = "Username can only contain letters, numbers, and underscores")]
-  public string? Username { get; set; } = string.Empty;
-  [Required(ErrorMessage = "Email is required")]
-  [EmailAddress(ErrorMessage = "Invalid email address")]
-  [StringLength(100, ErrorMessage = "Email must be less than 100 characters")]
+  [Required(ErrorMessage = "Укажите никнейм")]
+  [StringLength(32, MinimumLength = 3, ErrorMessage = "От 3 до 32 символов")]
+  [RegularExpression("^[a-zA-Z0-9_]+$", ErrorMessage = "Только латинские буквы, цифры и _")]
+  public string Username { get; set; } = string.Empty;
+
+  [Required(ErrorMessage = "Укажите email")]
+  [EmailAddress(ErrorMessage = "Некорректный email")]
+  [StringLength(254, ErrorMessage = "Некорректный email")]
   public string Email { get; set; } = string.Empty;
-  [StringLength(50, ErrorMessage = "First name must be less than 50 characters")]
-  public string? FirstName { get; set; } = string.Empty;
-  [StringLength(50, ErrorMessage = "Last name must be less than 50 characters")]
-  public string? LastName { get; set; } = string.Empty;
-  [StringLength(500, ErrorMessage = "Bio must be less than 500 characters")]
-  public string? Bio { get; set; } = string.Empty;
+
+  [StringLength(50, ErrorMessage = "Не больше 50 символов")]
+  public string? FirstName { get; set; }
+
+  [StringLength(50, ErrorMessage = "Не больше 50 символов")]
+  public string? LastName { get; set; }
+
+  [StringLength(500, ErrorMessage = "Не больше 500 символов")]
+  public string? Bio { get; set; }
+
   public DateOnly? BirthDate { get; set; }
 }

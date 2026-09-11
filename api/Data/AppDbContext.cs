@@ -40,6 +40,8 @@ public class AppDbContext : DbContext
       user.Property(u => u.LastName).HasMaxLength(50);
       user.Property(u => u.Bio).HasMaxLength(500);
       user.Property(u => u.AvatarFileName).HasMaxLength(64);
+      user.HasIndex(u => u.Username).IsUnique();
+      user.HasIndex(u => u.Email).IsUnique();
     });
   }
 }

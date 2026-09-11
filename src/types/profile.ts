@@ -1,5 +1,3 @@
-// Профиль, который возвращает GET /api/profile (и все остальные ручки профиля).
-// Контракт описан в api/Docs/profile-backend.md.
 export type Profile = {
   id: number;
   email: string;
@@ -7,12 +5,11 @@ export type Profile = {
   firstName: string | null;
   lastName: string | null;
   bio: string | null;
-  birthDate: string | null;    // "YYYY-MM-DD"
-  avatarUrl: string | null;    // "/uploads/avatars/xxx.webp" или абсолютный URL
-  createdAtUtc: string | null; // ISO-дата регистрации
+  birthDate: string | null;    
+  avatarUrl: string | null;    
+  createdAtUtc: string | null; 
 };
 
-// Тело PUT /api/profile. Пустые необязательные поля отправляем как null.
 export type UpdateProfileRequest = {
   username: string;
   email: string;

@@ -11,7 +11,7 @@ namespace api.Controllers;
 
 [ApiController]
 [Authorize]
-[Route("api/[controller]")]
+[Route("api/profile")]
 public class ProfileController : ControllerBase
 {
     private readonly AppDbContext _db;
@@ -26,54 +26,101 @@ public class ProfileController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<ProfileDto>> GetProfile()
     {
-      var user = await GetCurrentUserAsync();
-      if (user == null)
-      {
-          return Unauthorized();
-      }
+        var user = await GetCurrentUserAsync();
 
-      return Ok(ToDto(user));
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        return Ok(ToDto(user));
     }
 
     [HttpPut]
     public async Task<ActionResult<ProfileDto>> UpdateProfile(UpdateProfileRequest request)
     {
         var user = await GetCurrentUserAsync();
+
         if (user == null)
         {
             return Unauthorized();
         }
 
-        user.Username = request.Username;
-        user.Email = request.Email;
-        user.FirstName = request.FirstName;
-        user.LastName = request.LastName;
-        user.Bio = request.Bio;
+        if (request.BirthDate is { } birthDate)
+        {
+            var maxBirthDate = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(1);
+
+            if (birthDate > maxBirthDate)
+            {
+                ModelState.AddModelError(nameof(request.BirthDate), "Дата не может быть в будущем");
+            }
+            else if (birthDate < new DateOnly(1900, 1, 1))
+            {
+                ModelState.AddModelError(nameof(request.BirthDate), "Слишком ранняя дата");
+            }
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return ValidationProblem(ModelState);
+        }
+
+        var username = request.Username.Trim();
+        var email = request.Email.Trim().ToLowerInvariant();
+
+        var usernameTaken = await _db.Users.AnyAsync(x => x.Id != user.Id && x.Username == username);
+
+        if (usernameTaken)
+        {
+            return Conflict(new
+            {
+                message = "Этот никнейм уже занят",
+                field = "username"
+            });
+        }
+
+        var emailTaken = await _db.Users.AnyAsync(x => x.Id != user.Id && x.Email == email);
+
+        if (emailTaken)
+        {
+            return Conflict(new
+            {
+                message = "Этот email уже используется",
+                field = "email"
+            });
+        }
+
+        user.Username = username;
+        user.Email = email;
+        user.FirstName = NullIfEmpty(request.FirstName);
+        user.LastName = NullIfEmpty(request.LastName);
+        user.Bio = NullIfEmpty(request.Bio);
+        user.BirthDate = request.BirthDate;
         user.UpdatedAtUtc = DateTime.UtcNow;
 
-        _db.Users.Update(user);
-        await _db.SaveChangesAsync();
+        try
+        {
+            await _db.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            return Conflict(new
+            {
+                message = "Никнейм или email уже заняты"
+            });
+        }
 
         return Ok(ToDto(user));
     }
 
     [HttpPost("avatar")]
-    public async Task<ActionResult<ProfileDto>> UploadAvatar(IFormFile avatar, CancellationToken cancellationToken)
+    public async Task<ActionResult<ProfileDto>> UploadAvatar(IFormFile? avatar, CancellationToken cancellationToken)
     {
         var user = await GetCurrentUserAsync();
 
         if (user == null)
         {
             return Unauthorized();
-        }
-
-        if (avatar == null) 
-        {
-          return BadRequest(new
-          {
-            message = "No file uploaded",
-            field = "avatar"
-          });
         }
 
         var error = _avatars.Validate(avatar);
@@ -88,18 +135,19 @@ public class ProfileController : ControllerBase
         }
 
         var oldFileName = user.AvatarFileName;
-        var newFileName = await _avatars.SaveAsync(avatar, cancellationToken);
+        var newFileName = await _avatars.SaveAsync(avatar!, cancellationToken);
 
         user.AvatarFileName = newFileName;
         user.UpdatedAtUtc = DateTime.UtcNow;
 
-        try 
+        try
         {
-          await _db.SaveChangesAsync(cancellationToken);
-        } catch
+            await _db.SaveChangesAsync(cancellationToken);
+        }
+        catch
         {
-          _avatars.Delete(newFileName);
-          throw;
+            _avatars.Delete(newFileName);
+            throw;
         }
 
         _avatars.Delete(oldFileName);
@@ -107,28 +155,61 @@ public class ProfileController : ControllerBase
         return Ok(ToDto(user));
     }
 
-    public async Task<User?> GetCurrentUserAsync()
+    [HttpDelete("avatar")]
+    public async Task<ActionResult<ProfileDto>> DeleteAvatar()
+    {
+        var user = await GetCurrentUserAsync();
+
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        var oldFileName = user.AvatarFileName;
+
+        if (oldFileName != null)
+        {
+            user.AvatarFileName = null;
+            user.UpdatedAtUtc = DateTime.UtcNow;
+
+            await _db.SaveChangesAsync();
+
+            _avatars.Delete(oldFileName);
+        }
+
+        return Ok(ToDto(user));
+    }
+
+    private async Task<User?> GetCurrentUserAsync()
     {
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        if (userIdClaim == null)
+        if (!int.TryParse(userIdClaim, out var userId))
         {
             return null;
         }
 
-        return await _db.Users.SingleOrDefaultAsync(u => u.Id.ToString() == userIdClaim);
+        return await _db.Users.SingleOrDefaultAsync(u => u.Id == userId);
     }
 
     private ProfileDto ToDto(User user)
     {
-      return new ProfileDto
+        return new ProfileDto
         {
             Id = user.Id,
+            Email = user.Email,
             Username = user.Username,
             FirstName = user.FirstName,
             LastName = user.LastName,
             Bio = user.Bio,
-            AvatarFileName = _avatars.GetUrl(user.AvatarFileName)
+            BirthDate = user.BirthDate,
+            AvatarUrl = _avatars.GetUrl(user.AvatarFileName),
+            CreatedAtUtc = DateTime.SpecifyKind(user.CreatedAtUtc, DateTimeKind.Utc)
         };
+    }
+
+    private static string? NullIfEmpty(string? value)
+    {
+        return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
     }
 }

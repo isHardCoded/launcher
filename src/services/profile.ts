@@ -1,7 +1,6 @@
 import { apiRequest } from "@/lib/api";
 import type { Profile, UpdateProfileRequest } from "@/types/profile";
 
-// Если бекенд ответил 204 без тела — сами дочитываем актуальный профиль.
 async function withProfile(request: Promise<Profile | undefined>) {
   return (await request) ?? PROFILE_SERVICE.get();
 }

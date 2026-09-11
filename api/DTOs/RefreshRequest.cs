@@ -4,6 +4,6 @@ namespace api.DTOs;
 
 public class RefreshRequest
 {
-  [Required]
-  public string RefeshToken { get; set; } = null;
+  [Required(ErrorMessage = "Нет refresh-токена")]
+  public string RefreshToken { get; set; } = string.Empty;
 }

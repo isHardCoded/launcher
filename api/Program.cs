@@ -53,7 +53,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("ReactApp", policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
+        policy.WithOrigins("http://localhost:5173", "http://127.0.0.1:5173")
         .AllowAnyHeader()
         .AllowAnyMethod();
     });
@@ -80,7 +80,7 @@ app.UseStaticFiles(new StaticFileOptions
    FileProvider = new PhysicalFileProvider(
         app.Services.GetRequiredService<AvatarStorage>().RootPath
     ), 
-    RequestPath = "/uploads/avatars"
+    RequestPath = AvatarStorage.RequestPath
 });
 
 app.UseRouting();
