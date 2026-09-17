@@ -13,6 +13,11 @@ public class AppDbContext : DbContext
   public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
   public DbSet<User> Users => Set<User>();
 
+  public DbSet<CartItem> CartItems => Set<CartItem>();
+  public DbSet<Order> Orders => Set<Order>();
+  public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+  public DbSet<LibraryItem> LibraryItems => Set<LibraryItem>();
+
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
     base.OnModelCreating(modelBuilder);
@@ -43,5 +48,59 @@ public class AppDbContext : DbContext
       user.HasIndex(u => u.Username).IsUnique();
       user.HasIndex(u => u.Email).IsUnique();
     });
+
+    modelBuilder.Entity<CartItem>(cart =>
+    {
+      cart.HasOne(item => item.User)
+        .WithMany()
+        .HasForeignKey(item => item.UserId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+      cart.HasOne(item => item.Game)
+        .WithMany()
+        .HasForeignKey(item => item.GameId)
+        .OnDelete(DeleteBehavior.Cascade);
+    });
+
+    modelBuilder.Entity<Order>(order =>
+    {
+      order.Property(o => o.Number).HasMaxLength(40);
+    });
+
+    modelBuilder.Entity<OrderItem>(item =>
+    {
+      item.Property(i => i.Title).HasMaxLength(200);
+
+      item.HasOne(i => i.Order)
+        .WithMany(order => order.Items)
+        .HasForeignKey(i => i.OrderId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+      item.HasOne(i => i.Game)
+        .WithMany()
+        .HasForeignKey(i => i.GameId)
+        .OnDelete(DeleteBehavior.Cascade);
+    });
+
+    modelBuilder.Entity<LibraryItem>(library =>
+    {
+      library.HasKey(item => new { item.UserId, item.GameId });
+
+      library.HasOne(item => item.User)
+        .WithMany()
+        .HasForeignKey(item => item.UserId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+      library.HasOne(item => item.Game)
+        .WithMany()
+        .HasForeignKey(item => item.GameId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+      library.HasOne(item => item.Order)
+        .WithMany()
+        .HasForeignKey(item => item.OrderId)
+        .OnDelete(DeleteBehavior.Cascade);
+    });
+
   }
 }
